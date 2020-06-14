@@ -1,5 +1,5 @@
-let isMomHappy = true;
-// let isMomHappy = false;
+// let isMomHappy = true;
+let isMomHappy = false;
 let phone = {
   brand : 'Samsung',
   color : 'black'
@@ -13,3 +13,6 @@ var willIGetNewPhone = new Promise((resolve,reject)=>{
     reject(Error('mom is not happy'));
   }
 });
+
+
+// console.log(willIGetNewPhone);
