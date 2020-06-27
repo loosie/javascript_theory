@@ -9,10 +9,11 @@
 var express = require('express');
 var router = express.Router();
 let User = require("../models/users");
-const users = require('../models/users');
 let util = require('../modules/util');
 let statusCode = require('../modules/statusCode');
 let resMessage = require('../modules/responseMessage');
+
+const crypto = require('crypto');
 
 
 /* v1 (요청받고 응답주기)
@@ -55,10 +56,14 @@ router.post('/signup', async(req, res) => {
       res
         .status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, resMessage.ALREADY_ID));
-    
   }
+
+  const salt = crypto.randomBytes(32).toString();
+  const hashedPassword = crypto.pbkdf2Sync(password,salt, 1, 32, 'sha512').toString('hex');
   
-  User.push({id, name, password, email});
+  User.push({id, name, hashedPassword, email});
+   console.log(salt);
+   console.log(hashedPassword);
   res
   .status(statusCode.CREATED)
   .send(util.success(statusCode.CREATED, resMessage.CREATED_USER, {userId : id}));
@@ -95,8 +100,7 @@ router.get('/profile/:id', async(req, res)=>{
   const id = req.params.id;
 
   const user = User.filter(user => user.id ==id);
-  console.log(user)
-  console.log(user[0])
+
   if(user[0] === undefined){
     res
       .status(statusCode.BAD_REQUEST)
