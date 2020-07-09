@@ -52,22 +52,28 @@ router.post('/signup', async(req, res) => {
       .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
   }
   // already ID
-  if(User.filter(user => user.id == id).length >0){
-      res
-        .status(statusCode.BAD_REQUEST)
+  if (User.checkUser(user)) {
+    res.status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, resMessage.ALREADY_ID));
-  }
+    return;
+}
 
   const salt = crypto.randomBytes(32).toString();
-  const hashedPassword = crypto.pbkdf2Sync(password,salt, 1, 32, 'sha512').toString('hex');
+  // const hashedPassword = crypto.pbkdf2Sync(password,salt, 1, 32, 'sha512').toString('hex');
   
-  User.push({id, name, hashedPassword, email});
-   console.log(salt);
-   console.log(hashedPassword);
+  // User.push({id, name, hashedPassword, email});
+  const idx = await User.signup(id, name, password, salt, email);
+  if (idx === -1) {
+      return res.status(statusCode.DB_ERROR)
+          .send(util.fail(statusCode.DB_ERROR, resMessage.DB_ERROR));
+  }
+  res.status(statusCode.OK)
+      .send(util.success(statusCode.OK, resMessage.CREATED_USER, {userId: idx}));
   res
   .status(statusCode.CREATED)
   .send(util.success(statusCode.CREATED, resMessage.CREATED_USER, {userId : id}));
 });
+
 
 router.post('/signin', async(req,res)=>{
   const{id, password} =req.body;
