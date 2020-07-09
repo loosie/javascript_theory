@@ -1,11 +1,3 @@
-/* 
-  sign up
-  METHOD : POST
-  URI : localhost:3000/api/users/signup
-  REQUEST BODY : id, name, password, email
-  RESPONSE STATUS : 200 (OK)
-  RESPONSE DATA : All User Data
-*/
 var express = require('express');
 var router = express.Router();
 let User = require("../models/users");
@@ -52,10 +44,10 @@ router.post('/signup', async(req, res) => {
       .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
   }
   // already ID
-  if (User.checkUser(user)) {
-    res.status(statusCode.BAD_REQUEST)
+  if (await User.checkUser(user)) {
+    return res.status(statusCode.BAD_REQUEST)
         .send(util.fail(statusCode.BAD_REQUEST, resMessage.ALREADY_ID));
-    return;
+ 
 }
 
   const salt = crypto.randomBytes(32).toString();
@@ -69,9 +61,7 @@ router.post('/signup', async(req, res) => {
   }
   res.status(statusCode.OK)
       .send(util.success(statusCode.OK, resMessage.CREATED_USER, {userId: idx}));
-  res
-  .status(statusCode.CREATED)
-  .send(util.success(statusCode.CREATED, resMessage.CREATED_USER, {userId : id}));
+ 
 });
 
 
