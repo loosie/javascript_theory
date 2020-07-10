@@ -25,6 +25,8 @@ module.exports = {
     READ_ALL_POSTS:'전체 글 조회 성공',
     CHANGED_USER_INFO:'글 수정 성공',
     NULL_POST:'게시글이 없습니다',
-    DELETE_SUCCESS:'게시글 삭제 성공'
+    DELETE_SUCCESS:'게시글 삭제 성공',
+
+    DB_ERROR: "DB 오류"
   
   };

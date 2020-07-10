@@ -10,7 +10,7 @@ const user = {
         try {
             const result = await pool.queryParamArr(query, values);
             const insertId = result.insertId;
-            return insertId;
+            return insertId;                   
         } catch (err) {
             if (err.errno == 1062) {
                 console.log('signup ERROR : ', err.errno, err.code);
