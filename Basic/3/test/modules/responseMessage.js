@@ -23,7 +23,7 @@ module.exports = {
     CREATED_POST:"게시글 생성됨",
     READ_USER_ID:'아이디 조회 성공',
     READ_ALL_POSTS:'전체 글 조회 성공',
-    CHANGED_USER_INFO:'글 수정 성공',
+    CHANGED_POST:'글 수정 성공',
     NULL_POST:'게시글이 없습니다',
     DELETE_SUCCESS:'게시글 삭제 성공',
 

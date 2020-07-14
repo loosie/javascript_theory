@@ -40,7 +40,6 @@ router.post('/signup', async(req, res) => {
 
   // request data 확인 후 없다면 Bad Request
   if (!id || !name || !password || !email){
-    console.log(id +',' +name +',' + password +',' + email)
   return res
          .status(statusCode.BAD_REQUEST)
          .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
@@ -73,42 +72,44 @@ router.post('/signin', async(req,res)=>{
   const{id, password} =req.body;
 
   if(!id || !password){
-    res
-      .status(statusCode.BAD_REQUEST)
-      .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
-  }
-  const user = User.filter(user => user.id ==id);
-  if(user.length ==0){
-    res
-      .status(statusCode.BAD_REQUEST)
-      .send(util.fail(statusCode.BAD_REQUEST, resMessage.NO_USER));
-  }
-
-  if(user[0].password !== password){
-    res
-      .status(statusCode.BAD_REQUEST)
-      .send(util.fail(statusCode.BAD_REQUEST, resMessage.MISS_MATCH_PW));
+    return res
+             .status(statusCode.BAD_REQUEST)
+             .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
+  } 
+// ID 존재유무 확인
+  if(await User.checkUser(id)==false){
+    return res
+              .status(statusCode.BAD_REQUEST)
+              .send(util.fail(statusCode.BAD_REQUEST, resMessage.NO_USER));
   }
 
-  res
-  .status(statusCode.OK)
-  .send(util.success(statusCode.Ok, resMessage.LOGIN_SUCCESS, {userId : id}));
+// 비밀번호 불일치            
+  if(await User.signin(id,password)==false){
+    return res
+              .status(statusCode.BAD_REQUEST)
+              .send(util.fail(statusCode.BAD_REQUEST,resMessage.MISS_MATCH_PW));
+  }
+
+//  성공
+  return res
+          .status(statusCode.OK)
+          .send(util.success(statusCode.OK,resMessage.LOGIN_SUCCESS, {userId :id}));
 
 });
 
 router.get('/profile/:id', async(req, res)=>{
   const id = req.params.id;
 
-  const user = User.filter(user => user.id ==id);
-
-  if(user[0] === undefined){
+// id 존재 유무
+  if(await User.checkUser(id)===false){
     res
       .status(statusCode.BAD_REQUEST)
       .send(util.fail(statusCode.BAD_REQUEST, resMessage.NO_USER));
   }
 
+  const user = await User.getUserById(id);
   res
     .status(statusCode.OK)
-    .send(util.success(statusCode.OK, resMessage.READ_PROFILE_SUCCESS, user[0]));
+    .send(util.success(statusCode.OK, resMessage.READ_PROFILE_SUCCESS, user));
 })
 module.exports = router;

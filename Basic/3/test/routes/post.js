@@ -11,22 +11,21 @@ let moment = require('moment');
 router.get('/', async(req, res)=>{
     res
         .status(statusCode.OK)
-        .send(statusCode.OK, resMessage.READ_ALL_POSTS, Post);
+        .send(statusCode.OK, resMessage.READ_ALL_POSTS, await Post.readAllPost());
 
 });
 
-//  게시글 고유 id값을 조회
+//  게시글 id값 조회
 router.get('/:id', async(req, res)=>{
     const id = req.params.id;
 
-    const post = Post.filter(post => post.postIdx ==id);
+    const post = await Post.readPost(id);
+ // 게시글 없을 때
+    if(post.length ===0)
+        return res 
+                .status(statusCode.BAD_REQUEST)
+                .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_POST));
 
-    // 게시글 없을 때
-    if(post[0] === undefined){
-        res
-            .status(statusCode.BAD_REQUEST)
-            .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_POST));
-    }
 
     res
         .status(statusCode.OK)
@@ -45,10 +44,7 @@ router.post('/', async(req, res)=>{
             .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
     }
 
-    const postIdx = parseInt(Post[Post.length-1].postIdx) +1;
-    const date = moment().format("YYYY년 MM월 DD일");
-    Post.push({postIdx, author, title, content, date});
-    const post = Post.filter(post => post.postIdx == postIdx);
+    const postIdx = await Post.writePost(author, title, content);
 
     res
         .status(statusCode.CREATED)
@@ -68,22 +64,20 @@ router.put('/:id', async(req, res)=>{
 //         .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_POST));
 //     }
 
-// 게시글 없을 때
-    const post = Post.filter(post => post.postIdx ==id);
+
+    await Post.updatePost(id, title, content);
+    const post = await Post.readPost(id);
+
+    // 게시글 없을 때
     if(post[0] === undefined){
         res
             .status(statusCode.BAD_REQUEST)
             .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_POST));
     }
 
-    for(item in dto){
-        post[0][`${item}`] = dto[`${item}`];
-    }
-    post[0].date = moment().format("YYYY년 MM월 DD일");
-
     res
         .status(statusCode.OK)
-        .send(util.success(statusCode.OK, resMessage.CHANGED_USER_INFO, post[0]));
+        .send(util.success(statusCode.OK, resMessage.CHANGED_POST, post[0]));
 });
 
 
@@ -91,8 +85,6 @@ router.put('/:id', async(req, res)=>{
 router.delete('/:id', async(req, res)=>{
     const id = req.params.id;
     const post = Post.filter(post => post.postIdx == id);
-
- 
 
     // 게시글 없을 때
     if(post[0] === undefined){

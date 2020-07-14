@@ -1,4 +1,5 @@
 const pool = require('../modules/pool');
+const crypto = require('crypto');
 const table = 'user';
 
 const user = {
@@ -40,9 +41,9 @@ const user = {
       const query = `SELECT * FROM ${table} WHERE id = "${id}";`
       try{
           const result = await pool.queryParam(query);
-          const hasedPassword = await crypto.pbkdf2Sync(password, result[0].salt, 1, 32, 'sha512').toString('hex');
-
-          if(result[0].password === hasedPassword) return true;
+          const hashedPassword = await crypto.pbkdf2Sync(password, result[0].salt, 1, 32, 'sha512').toString('hex');
+        console.log(hashedPassword +"," + result[0].password);
+          if(result[0].password === hashedPassword) return true;
           else return false;
       } catch(err){
           console.log('signin ERROR : ', err);
