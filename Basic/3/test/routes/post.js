@@ -9,9 +9,10 @@ let moment = require('moment');
 
 //  모든 게시글 조회
 router.get('/', async(req, res)=>{
-    res
+    const allPost = await Post.readAllPost();
+    return res
         .status(statusCode.OK)
-        .send(statusCode.OK, resMessage.READ_ALL_POSTS, await Post.readAllPost());
+        .send(util.success(statusCode.OK, resMessage.READ_ALL_POSTS,allPost));
 
 });
 
@@ -48,7 +49,7 @@ router.post('/', async(req, res)=>{
 
     res
         .status(statusCode.CREATED)
-        .send(util.success(statusCode.CREATED, resMessage.CREATED_POST, post[0]));
+        .send(util.success(statusCode.CREATED, resMessage.CREATED_POST, {postIdx : postIdx}));
 });
 
 // 게시글 고유 id값을 가진 게시글을 수정
@@ -84,16 +85,15 @@ router.put('/:id', async(req, res)=>{
 // 게시글 고유 id값을 가진 게시글 삭제
 router.delete('/:id', async(req, res)=>{
     const id = req.params.id;
-    const post = Post.filter(post => post.postIdx == id);
 
     // 게시글 없을 때
-    if(post[0] === undefined){
+    if(!id){
         res
             .status(statusCode.BAD_REQUEST)
             .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_POST));
     }
-    Post.splice(id);
-    // console.log(Post);
+
+    await Post.deletePost(id);
 
     res
         .status(statusCode.OK)

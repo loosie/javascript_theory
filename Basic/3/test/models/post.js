@@ -28,7 +28,7 @@ const post = {
     },
     writePost : async (author, title, content) =>{
         const createdAt = moment().format("YYYY년 MM월 DD일");
-        const field = 'author, title, content ,createdAt';
+        const fields = 'author, title, content ,createdAt';
         const questions = `?, ?, ?, "${createdAt}"`;
         const values = [author, title, content];
         const query = `INSERT INTO ${table}(${fields}) VALUES(${questions})`;
