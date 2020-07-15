@@ -5,6 +5,7 @@ let util = require('../modules/util');
 let statusCode = require('../modules/statusCode');
 let resMessage = require('../modules/responseMessage');
 
+const jwt = require('../modules/jwt');
 const crypto = require('crypto');
 const responseMessage = require('../modules/responseMessage');
 
@@ -77,7 +78,8 @@ router.post('/signin', async(req,res)=>{
              .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
   } 
 // ID 존재유무 확인
-  if(await User.checkUser(id)==false){
+  const user = await User.getUserById(id);
+  if(user.id === undefined){
     return res
               .status(statusCode.BAD_REQUEST)
               .send(util.fail(statusCode.BAD_REQUEST, resMessage.NO_USER));
@@ -90,10 +92,11 @@ router.post('/signin', async(req,res)=>{
               .send(util.fail(statusCode.BAD_REQUEST,resMessage.MISS_MATCH_PW));
   }
 
+  const {token, _} = await jwt.sign(user);
 //  성공
   return res
           .status(statusCode.OK)
-          .send(util.success(statusCode.OK,resMessage.LOGIN_SUCCESS, {userId :id}));
+          .send(util.success(statusCode.OK,resMessage.LOGIN_SUCCESS, {accessToken :token}));
 
 });
 

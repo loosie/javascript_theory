@@ -42,7 +42,7 @@ const user = {
       try{
           const result = await pool.queryParam(query);
           const hashedPassword = await crypto.pbkdf2Sync(password, result[0].salt, 1, 32, 'sha512').toString('hex');
-        console.log(hashedPassword +"," + result[0].password);
+
           if(result[0].password === hashedPassword) return true;
           else return false;
       } catch(err){
