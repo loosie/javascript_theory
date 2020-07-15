@@ -34,6 +34,7 @@ module.exports = {
                 return TOKEN_INVALID;
             }
         }
+        console.log(decoded);
         return decoded;
     }
 }

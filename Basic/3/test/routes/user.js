@@ -79,7 +79,7 @@ router.post('/signin', async(req,res)=>{
   } 
 // ID 존재유무 확인
   const user = await User.getUserById(id);
-  if(user.id === undefined){
+  if(user.idx === undefined){
     return res
               .status(statusCode.BAD_REQUEST)
               .send(util.fail(statusCode.BAD_REQUEST, resMessage.NO_USER));
@@ -93,7 +93,8 @@ router.post('/signin', async(req,res)=>{
   }
 
   const {token, _} = await jwt.sign(user);
-//  성공
+  console.log(user);
+// 성공
   return res
           .status(statusCode.OK)
           .send(util.success(statusCode.OK,resMessage.LOGIN_SUCCESS, {accessToken :token}));
