@@ -93,7 +93,7 @@ router.post('/signin', async(req,res)=>{
   }
 
   const {token, _} = await jwt.sign(user);
-  console.log(user);
+
 // 성공
   return res
           .status(statusCode.OK)
