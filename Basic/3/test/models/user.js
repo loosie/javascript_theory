@@ -55,7 +55,7 @@ const user = {
         try{
             const result = await pool.queryParam(query);
             const userDto = {
-                idx : result[0].useridx,
+                useridx : result[0].useridx,
                 id : result[0].id,
                 name : result[0].name,
                 email : result[0].email

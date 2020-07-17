@@ -26,20 +26,19 @@ router.get('/local', async (req, res) => {
             return res.json(util.fail(CODE.BAD_REQUEST, MSG.EMPTY_TOKEN));
         }
         const user = await jwt.verify(token);
-        console.log("user : " +user.idx);
-        // console.log('token : ' + token);
-        // console.log(user.useridx)
+        // console.log("user : " +user.name);
+        // console.log("user : " +user);
+        
+        // // TODO: idx값 가져오기
+        console.log(user.idx);
 
         if (user === TOKEN_EXPIRED) {
-            console.log(1);
             return res.json(util.fail(CODE.UNAUTHORIZED, MSG.EXPIRED_TOKEN));
         }
         if (user === TOKEN_INVALID) {
-            console.log(2);
             return res.json(util.fail(CODE.UNAUTHORIZED, MSG.INVALID_TOKEN));
         }
-        if (user.name === undefined) {
-            console.log(3);
+        if (user.idx === undefined) {
             return res.json(util.fail(CODE.UNAUTHORIZED, MSG.INVALID_TOKEN));
         }
         return res.json(util.success(CODE.OK, MSG.AUTH_SUCCESS));

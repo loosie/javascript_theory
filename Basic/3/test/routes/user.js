@@ -79,7 +79,7 @@ router.post('/signin', async(req,res)=>{
   } 
 // ID 존재유무 확인
   const user = await User.getUserById(id);
-  if(user.idx === undefined){
+  if(user.useridx === undefined){
     return res
               .status(statusCode.BAD_REQUEST)
               .send(util.fail(statusCode.BAD_REQUEST, resMessage.NO_USER));
