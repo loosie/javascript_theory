@@ -1,103 +1,23 @@
 var express = require('express');
 var router = express.Router();
-let Post = require("../models/post");
-let util = require('../modules/util');
-let statusCode = require('../modules/statusCode');
-let resMessage = require('../modules/responseMessage');
 
-let moment = require('moment');
+const postController = require('../controllers/postController');
+const authUtil = require('../middlewares/auth').checkToken;
+
 
 //  모든 게시글 조회
-router.get('/', async(req, res)=>{
-    const allPost = await Post.readAllPost();
-    return res
-        .status(statusCode.OK)
-        .send(util.success(statusCode.OK, resMessage.READ_ALL_POSTS,allPost));
-
-});
+router.get('/', postController.readAllPost);
 
 //  게시글 id값 조회
-router.get('/:id', async(req, res)=>{
-    const id = req.params.id;
-
-    const post = await Post.readPost(id);
- // 게시글 없을 때
-    if(post.length ===0)
-        return res 
-                .status(statusCode.BAD_REQUEST)
-                .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_POST));
-
-
-    res
-        .status(statusCode.OK)
-        .send(util.success(statusCode.OK, resMessage.READ_USER_ID, post[0]));
-});
-
+router.get('/:id', postController.readPost);
 
 // 게시글 생성
-router.post('/', async(req, res)=>{
-    const{author, title, content} = req.body;
-
-    // null 처리
-    if(!author || !title || !content){
-        res
-            .status(statusCode.BAD_REQUEST)
-            .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
-    }
-
-    const postIdx = await Post.writePost(author, title, content);
-
-    res
-        .status(statusCode.CREATED)
-        .send(util.success(statusCode.CREATED, resMessage.CREATED_POST, {postIdx : postIdx}));
-});
+router.post('/', authUtil, postController.createPost);
 
 // 게시글 고유 id값을 가진 게시글을 수정
-router.put('/:id', async(req, res)=>{
-    const id = req.params.id;
-    const dto = {author, title, content} = req.body;
-
-// 그냥 404에러
-// // null값
-//     if(!id){
-//         res
-//         .status(statusCode.BAD_REQUEST)
-//         .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_POST));
-//     }
-
-
-    await Post.updatePost(id, title, content);
-    const post = await Post.readPost(id);
-
-    // 게시글 없을 때
-    if(post[0] === undefined){
-        res
-            .status(statusCode.BAD_REQUEST)
-            .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_POST));
-    }
-
-    res
-        .status(statusCode.OK)
-        .send(util.success(statusCode.OK, resMessage.CHANGED_POST, post[0]));
-});
-
+router.put('/:id', authUtil, postController.modifyPost);
 
 // 게시글 고유 id값을 가진 게시글 삭제
-router.delete('/:id', async(req, res)=>{
-    const id = req.params.id;
+router.delete('/:id', authUtil, postController.deletePost);
 
-    // 게시글 없을 때
-    if(!id){
-        res
-            .status(statusCode.BAD_REQUEST)
-            .send(util.fail(statusCode.BAD_REQUEST, resMessage.NULL_POST));
-    }
-
-    await Post.deletePost(id);
-
-    res
-        .status(statusCode.OK)
-        .send(util.success(statusCode.OK, resMessage.DELETE_SUCCESS, {deletedIdx: id}));
-
-})
 module.exports = router;
