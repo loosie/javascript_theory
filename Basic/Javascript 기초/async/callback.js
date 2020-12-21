@@ -52,7 +52,7 @@ class UserStorage{
         }, 1000);
     }
 }
-
+ 
 const userStorage = new UserStorage();
 const id = prompt('enter your id');
 const password = prompt('enter your password');
